@@ -1,15 +1,17 @@
 {
   "name": "shorui-document-generator",
-  "version": "1.0.0",
-  "description": "AI-powered automatic document generator with Google OAuth and Perplexity API integration",
-  "main": "app.js",
+  "version": "0.1.0",
+  "description": "AI-powered automatic document generator with Google OAuth and Perplexity API integration - Beta v0.1",
+  "main": "app-final.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "node app-final.js",
+    "dev": "nodemon app-final.js",
+    "beta": "node app-final.js",
     "test-css": "node start.js",
     "dev-css": "nodemon start.js",
     "old-server": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "backup-app": "node app.js",
+    "test": "echo \"Shorui Beta v0.1 - No tests specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -31,7 +33,11 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["document-generator", "ai", "perplexity", "google-oauth", "nodejs", "ejs"],
-  "author": "Your Name",
-  "license": "MIT"
+  "keywords": ["document-generator", "ai", "perplexity", "google-oauth", "nodejs", "ejs", "flaxa-technologies"],
+  "author": "Flaxa Technologies",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/copilot-1627/shorui-document-generator.git"
+  }
 }
