@@ -171,3 +171,10 @@ uploads/
 
 # Production files
 .env.production
+
+# Persistent Storage Data
+data/
+*.json
+
+# Session files
+sess_*
