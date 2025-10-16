@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile - Shorui</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-primary">
+                        <i class="fas fa-file-alt mr-2"></i>Shorui
+                    </a>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                    <span class="hidden sm:inline">Setting up your account...</span>
+                    <i class="fas fa-user-cog"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-plus text-white text-2xl"></i>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
+                <p class="text-gray-600">We need a few more details to set up your account</p>
+            </div>
+            
+            <% if (locals.error) { %>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form action="/complete-profile" method="POST" class="space-y-6">
+                <!-- Phone Number -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-phone mr-1"></i>Phone Number *
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                        placeholder="+918310496175"
+                        pattern="^\\+[1-9]\\d{1,14}$"
+                        title="Please enter a valid international phone number starting with + and country code"
+                    >
+                    <div class="text-xs text-gray-500 mt-2 space-y-1">
+                        <p class="font-medium">Include country code. Examples:</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <p>• India: +91xxxxxxxxxx</p>
+                            <p>• USA: +1xxxxxxxxxx</p>
+                            <p>• Pakistan: +92xxxxxxxxxx</p>
+                            <p>• UK: +44xxxxxxxxxx</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Display existing info -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        Account Information from Google
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-user mr-2 w-4"></i>
+                            <span class="font-medium">Name:</span>
+                            <span class="ml-2"><%= user.firstName %> <%= user.lastName %></span>
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-envelope mr-2 w-4"></i>
+                            <span class="font-medium">Email:</span>
+                            <span class="ml-2"><%= user.email %></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    id="completeBtn"
+                    class="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-secondary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center justify-center"
+                >
+                    <i class="fas fa-check mr-2"></i>
+                    <span id="btnText">Complete Setup</span>
+                </button>
+            </form>
+            
+            <div class="text-center mt-6">
+                <a href="/auth/logout" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fas fa-times mr-1"></i>Cancel and logout
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-sm">&copy; 2025 Shorui - AI Document Generator <span class="text-blue-400">Beta v0.1</span></p>
+                <p class="text-xs text-gray-400 mt-1">Made with ❤️ by <span class="text-blue-400">Flaxa Technologies</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            const completeBtn = document.getElementById('completeBtn');
+            const btnText = document.getElementById('btnText');
+            
+            // Phone number formatting and validation
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value;
+                
+                // Remove all non-digit and non-plus characters
+                value = value.replace(/[^\\d+]/g, '');
+                
+                // Ensure it starts with + if there are digits
+                if (value && !value.startsWith('+')) {
+                    value = '+' + value;
+                }
+                
+                // Limit total length to 16 characters
+                if (value.length > 16) {
+                    value = value.substring(0, 16);
+                }
+                
+                e.target.value = value;
+                
+                // Real-time validation feedback
+                const isValid = /^\\+[1-9]\\d{1,14}$/.test(value);
+                if (value.length > 3) {
+                    if (isValid) {
+                        e.target.classList.remove('border-red-500', 'ring-red-500');
+                        e.target.classList.add('border-green-500', 'ring-green-500');
+                    } else {
+                        e.target.classList.remove('border-green-500', 'ring-green-500');
+                        e.target.classList.add('border-red-500', 'ring-red-500');
+                    }
+                } else {
+                    e.target.classList.remove('border-red-500', 'border-green-500', 'ring-red-500', 'ring-green-500');
+                }
+            });
+            
+            // Form submission with loading state
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const phoneValue = phoneInput.value;
+                const isValid = /^\\+[1-9]\\d{1,14}$/.test(phoneValue);
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please enter a valid international phone number with country code (e.g., +918310496175)');
+                    phoneInput.focus();
+                    return false;
+                }
+                
+                // Show loading state
+                completeBtn.disabled = true;
+                completeBtn.classList.add('opacity-75');
+                btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Setting up your account...';
+            });
+            
+            // Auto-focus on phone input
+            phoneInput.focus();
+        });
+    </script>
+</body>
+</html>
