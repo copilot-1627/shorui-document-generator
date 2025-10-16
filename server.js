@@ -20,6 +20,12 @@ const chatRoutes = require('./routes/chat');
 // Import models (in-memory storage)
 const { users, chatSessions, usageLimits } = require('./models/data');
 
+// Global request logger
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 // Static files - must be FIRST
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -37,7 +43,7 @@ app.use(helmet({
     }
 }));
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
@@ -87,6 +93,7 @@ passport.use(new GoogleStrategy({
             return done(null, newUser);
         }
     } catch (error) {
+        console.error('OAuth error:', error);
         return done(error, null);
     }
 }));
@@ -176,15 +183,27 @@ app.post('/complete-profile', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Unhandled error middleware:');
+    console.error('Request:', { method: req.method, url: req.originalUrl });
+    console.error('Body (truncated):', JSON.stringify(req.body || {}).slice(0, 1000));
+    console.error('Stack:', err.stack || err);
     res.status(500).render('error', { 
         message: 'Something went wrong!',
         title: 'Error - Shorui'
     });
 });
 
+// Process-level error handlers to show all errors
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
 // 404 handler
 app.use((req, res) => {
+    console.warn(`404 Not Found: ${req.method} ${req.originalUrl}`);
     res.status(404).render('404', { 
         title: 'Page Not Found - Shorui'
     });
