@@ -6,6 +6,7 @@ const path = require('path');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const expressLayouts = require('express-ejs-layouts');
 require('dotenv').config();
 
 const app = express();
@@ -19,14 +20,25 @@ const chatRoutes = require('./routes/chat');
 // Import models (in-memory storage)
 const { users, chatSessions, usageLimits } = require('./models/data');
 
+// Static files - must be FIRST
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Middleware
 app.use(helmet({
-    contentSecurityPolicy: false // Disabled for Tailwind CDN
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com"],
+            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'"]
+        },
+    }
 }));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -88,13 +100,16 @@ passport.deserializeUser((id, done) => {
     done(null, user);
 });
 
-// Set view engine
+// Set view engine and layouts
+app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('layout', 'layout');
 
 // Make user data available to all templates
 app.use((req, res, next) => {
     res.locals.user = req.user;
+    res.locals.script = '';
     next();
 });
 
@@ -108,7 +123,9 @@ app.get('/', (req, res) => {
     if (req.isAuthenticated() && req.user.isComplete) {
         return res.redirect('/dashboard');
     }
-    res.render('index');
+    res.render('index', { 
+        title: 'Shorui - AI Document Generator'
+    });
 });
 
 // Complete profile route
@@ -119,7 +136,9 @@ app.get('/complete-profile', (req, res) => {
     if (req.user.isComplete) {
         return res.redirect('/dashboard');
     }
-    res.render('complete-profile');
+    res.render('complete-profile', { 
+        title: 'Complete Profile - Shorui'
+    });
 });
 
 app.post('/complete-profile', (req, res) => {
@@ -133,7 +152,8 @@ app.post('/complete-profile', (req, res) => {
     const existingUser = users.find(u => u.phone === phone && u.id !== req.user.id);
     if (existingUser) {
         return res.render('complete-profile', { 
-            error: 'Phone number is already linked to another account' 
+            error: 'Phone number is already linked to another account',
+            title: 'Complete Profile - Shorui'
         });
     }
     
@@ -157,12 +177,17 @@ app.post('/complete-profile', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render('error', { message: 'Something went wrong!' });
+    res.status(500).render('error', { 
+        message: 'Something went wrong!',
+        title: 'Error - Shorui'
+    });
 });
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).render('404');
+    res.status(404).render('404', { 
+        title: 'Page Not Found - Shorui'
+    });
 });
 
 app.listen(PORT, () => {
