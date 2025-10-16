@@ -1,0 +1,158 @@
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                        Welcome back, <%= user.firstName %>!
+                    </h1>
+                    <p class="text-gray-600">Manage your documents and track your usage</p>
+                </div>
+                <a href="/chat" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary transition-colors">
+                    <i class="fas fa-plus mr-2"></i>New Document
+                </a>
+            </div>
+        </div>
+        
+        <!-- Usage Stats -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <!-- Documents Generated -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Documents Generated</p>
+                        <div class="flex items-center">
+                            <span class="text-2xl font-bold text-gray-900"><%= usage.documentsGenerated %></span>
+                            <span class="text-gray-500 ml-1">/ <%= usage.monthlyLimit %></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
+                        <span>Monthly Usage</span>
+                        <span><%= Math.round((usage.documentsGenerated / usage.monthlyLimit) * 100) %>%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full" style="width: <%= (usage.documentsGenerated / usage.monthlyLimit) * 100 %>%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Remaining Credits -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-credit-card text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Remaining Credits</p>
+                        <span class="text-2xl font-bold text-gray-900"><%= usage.monthlyLimit - usage.documentsGenerated %></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Status -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-crown text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Account Status</p>
+                        <span class="text-2xl font-bold text-gray-900">Free</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat History -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Recent Documents</h2>
+                <p class="text-gray-600">Your document generation history</p>
+            </div>
+            
+            <div class="p-6">
+                <% if (chatSessions && chatSessions.length > 0) { %>
+                    <div class="space-y-4">
+                        <% chatSessions.reverse().forEach(function(session) { %>
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <h3 class="font-medium text-gray-900 mb-1">
+                                            <i class="fas fa-file-alt text-gray-400 mr-2"></i>
+                                            <%= session.topic %>
+                                        </h3>
+                                        <div class="flex items-center text-sm text-gray-500 space-x-4">
+                                            <span>
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                <%= new Date(session.timestamp).toLocaleDateString() %>
+                                            </span>
+                                            <span>
+                                                <i class="far fa-clock mr-1"></i>
+                                                <%= new Date(session.timestamp).toLocaleTimeString() %>
+                                            </span>
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                <%= session.status %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 ml-4">
+                                        <a href="/chat/<%= session.id %>" class="text-primary hover:text-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/chat/download/<%= session.generatedFile %>" class="text-green-600 hover:text-green-700">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-8">
+                        <i class="fas fa-file-alt text-gray-300 text-4xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
+                        <p class="text-gray-600 mb-4">Create your first document to get started</p>
+                        <a href="/chat" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-secondary transition-colors">
+                            Create Document
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bar
+        const progressBars = document.querySelectorAll('.bg-primary');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.transition = 'width 1s ease-in-out';
+                bar.style.width = width;
+            }, 100);
+        });
+        
+        // Add hover effects to document cards
+        document.querySelectorAll('[class*="border-gray-200"]').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('shadow-md');
+            });
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('shadow-md');
+            });
+        });
+    });
+</script>

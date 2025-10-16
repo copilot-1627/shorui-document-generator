@@ -1,0 +1,127 @@
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2"><%= session.topic %></h1>
+                    <div class="flex items-center text-sm text-gray-600 space-x-4">
+                        <span>
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            <%= new Date(session.timestamp).toLocaleDateString() %>
+                        </span>
+                        <span>
+                            <i class="far fa-clock mr-1"></i>
+                            <%= new Date(session.timestamp).toLocaleTimeString() %>
+                        </span>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            <%= session.status %>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/chat/download/<%= session.generatedFile %>" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-download mr-2"></i>Download
+                    </a>
+                    <a href="/dashboard" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat History -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Document Generation Process</h2>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- User Request -->
+                <div class="flex items-start space-x-3">
+                    <div class="flex-1"></div>
+                    <div class="flex-shrink-0 max-w-md">
+                        <div class="bg-primary text-white rounded-lg p-4">
+                            <p><%= session.topic %></p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 text-right">You requested</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                </div>
+                
+                <!-- AI Response -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-gray-100 rounded-lg p-6">
+                            <h3 class="font-semibold text-gray-900 mb-3">Generated Document Code</h3>
+                            <div class="bg-gray-900 text-green-400 p-4 rounded text-sm font-mono overflow-x-auto">
+                                <pre><%= session.aiResponse %></pre>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">AI Assistant generated</p>
+                    </div>
+                </div>
+                
+                <!-- Generated File Info -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="font-semibold text-green-900">Document Generated Successfully</h3>
+                            <p class="text-green-700 text-sm">Filename: <%= session.generatedFile %></p>
+                        </div>
+                        <a href="/chat/download/<%= session.generatedFile %>" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="mt-6 flex justify-center space-x-4">
+            <a href="/chat" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary transition-colors">
+                <i class="fas fa-plus mr-2"></i>Create New Document
+            </a>
+            <a href="/dashboard" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                <i class="fas fa-home mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Syntax highlighting for code blocks
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add copy to clipboard functionality
+        const codeBlock = document.querySelector('pre');
+        if (codeBlock) {
+            const copyBtn = document.createElement('button');
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+            copyBtn.className = 'absolute top-2 right-2 bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs hover:bg-gray-600';
+            
+            const codeContainer = codeBlock.parentElement;
+            codeContainer.style.position = 'relative';
+            codeContainer.appendChild(copyBtn);
+            
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(codeBlock.textContent).then(function() {
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    copyBtn.className = copyBtn.className.replace('bg-gray-700', 'bg-green-600');
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+                        copyBtn.className = copyBtn.className.replace('bg-green-600', 'bg-gray-700');
+                    }, 2000);
+                });
+            });
+        }
+    });
+</script>
