@@ -23,10 +23,17 @@
                     name="phone" 
                     required 
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="+1234567890"
-                    pattern="\\+?[1-9]\\d{1,14}"
+                    placeholder="+918310496175"
+                    pattern="^\+[1-9]\d{1,14}$"
+                    title="Please enter a valid international phone number starting with + and country code (e.g., +918310496175, +1234567890, +923001234567)"
                 >
-                <p class="text-xs text-gray-500 mt-1">Include country code (e.g., +1 for US)</p>
+                <div class="text-xs text-gray-500 mt-1 space-y-1">
+                    <p>Include country code. Examples:</p>
+                    <p>• India: +91xxxxxxxxxx</p>
+                    <p>• Pakistan: +92xxxxxxxxxx</p>
+                    <p>• USA: +1xxxxxxxxxx</p>
+                    <p>• UK: +44xxxxxxxxxx</p>
+                </div>
             </div>
             
             <!-- Display existing info -->
@@ -55,12 +62,57 @@
 </div>
 
 <script>
-    // Phone number validation
-    document.getElementById('phone').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\\D/g, ''); // Remove non-digits
-        if (value && !value.startsWith('+')) {
-            value = '+' + value;
-        }
-        e.target.value = value;
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone');
+        
+        // Phone number formatting and validation
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value;
+            
+            // Remove all non-digit and non-plus characters
+            value = value.replace(/[^\d+]/g, '');
+            
+            // Ensure it starts with + if there are digits
+            if (value && !value.startsWith('+')) {
+                value = '+' + value;
+            }
+            
+            // Limit total length to 16 characters (+xxx plus up to 12 digits)
+            if (value.length > 16) {
+                value = value.substring(0, 16);
+            }
+            
+            e.target.value = value;
+            
+            // Real-time validation feedback
+            const isValid = /^\+[1-9]\d{1,14}$/.test(value);
+            if (value.length > 3) { // Only show feedback when user has typed something meaningful
+                if (isValid) {
+                    e.target.classList.remove('border-red-500');
+                    e.target.classList.add('border-green-500');
+                } else {
+                    e.target.classList.remove('border-green-500');
+                    e.target.classList.add('border-red-500');
+                }
+            } else {
+                e.target.classList.remove('border-red-500', 'border-green-500');
+            }
+        });
+        
+        // Prevent form submission with invalid phone number
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const phoneValue = phoneInput.value;
+            const isValid = /^\+[1-9]\d{1,14}$/.test(phoneValue);
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please enter a valid international phone number with country code (e.g., +918310496175)');
+                phoneInput.focus();
+                return false;
+            }
+        });
+        
+        // Auto-focus on phone input
+        phoneInput.focus();
     });
 </script>
